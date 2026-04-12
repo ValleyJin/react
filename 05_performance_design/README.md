@@ -97,6 +97,68 @@ memo 없이도 올바른 구조만으로 불필요한 리렌더링을 막을 수
     └── index.css
 ```
 
+### vite.config.js 설명
+
+```js
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+
+export default defineConfig({
+  plugins: [react()],
+})
+```
+
+| 줄 | 설명 |
+|----|------|
+| `import { defineConfig }` | 타입 힌트와 자동완성을 제공하는 Vite 헬퍼 함수 |
+| `import react` | JSX 변환 + Fast Refresh를 담당하는 React 공식 플러그인 |
+| `defineConfig({ ... })` | 설정 객체를 감싸는 래퍼 (없어도 동작하지만 IDE 지원을 위해 사용) |
+| `plugins: [react()]` | React 플러그인 등록 — 없으면 JSX를 파싱하지 못해 에러 발생 |
+
+**이 파일은 개발자 코드 어디에서도 import하지 않는다.**
+`vite.config.js`는 Vite 실행 엔진이 자동으로 찾아 읽는 약속된 파일이다.
+
+```bash
+npm run dev   →   Vite가 실행되면서 vite.config.js를 자동으로 탐색해 읽는다
+```
+
+파일 이름이 반드시 `vite.config.js`이어야 하는 이유도 이 약속 때문이다.
+`my-vite-config.js`처럼 이름을 바꾸면 Vite가 찾지 못한다.
+
+`@vitejs/plugin-react`가 제공하는 **Fast Refresh** 덕분에, 코드를 수정할 때
+페이지 전체를 새로고침하지 않고 변경된 컴포넌트만 즉시 반영된다.
+개발 중 state가 유지된 채로 UI가 업데이트되는 것이 이 플러그인 덕분이다.
+
+#### 설치 vs 등록 — 헷갈리기 쉬운 개념
+
+"플러그인 등록"과 "플러그인 설치"는 다른 개념이다.
+
+| 구분 | 시점 | 명령어 | 결과 |
+|------|------|--------|------|
+| **설치** | `npm install` 실행 시 | `npm install` | `node_modules/` 안에 파일이 생긴다 |
+| **등록** | `vite.config.js` 작성 시 | (코드 작성) | Vite가 해당 플러그인을 실제로 사용한다 |
+
+비유하자면:
+
+- **설치** = 앱스토어에서 카카오톡을 다운로드 (파일이 폰에 존재)
+- **등록** = 카카오톡을 기본 메신저로 설정 (실제로 사용하도록 연결)
+
+앱이 깔려 있어도 기본 메신저로 설정하지 않으면 동작하지 않는 것처럼,
+플러그인도 `npm install`로 설치만 하고 `plugins`에 넣지 않으면 Vite가 사용하지 않는다.
+
+```json
+// package.json — 설치 목록 (npm install로 파일을 받아두는 것)
+"devDependencies": {
+  "@vitejs/plugin-react": "^4.2.1"
+}
+```
+
+```js
+// vite.config.js — 등록 (설치된 플러그인을 실제로 Vite에 연결하는 것)
+import react from '@vitejs/plugin-react'  // 설치된 플러그인을 불러오고
+plugins: [react()]                         // Vite에게 "이걸 써라"고 연결
+```
+
 ---
 
 ## 코드 설명
